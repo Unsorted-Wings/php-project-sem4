@@ -1,3 +1,76 @@
+<?php
+session_start();
+
+// Define variables and initialize with empty values
+$first_name = $last_name = $email = $username = $password = $confirm_password = "";
+$first_name_err = $last_name_err = $email_err = $username_err = $password_err = $confirm_password_err = "";
+$captcha_err = "";
+
+// Process form data when the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate first name
+    if (empty(trim($_POST["first_name"]))) {
+        $first_name_err = "Please enter your first name.";
+    } else {
+        $first_name = trim($_POST["first_name"]);
+    }
+
+    // Validate last name
+    if (empty(trim($_POST["last_name"]))) {
+        $last_name_err = "Please enter your last name.";
+    } else {
+        $last_name = trim($_POST["last_name"]);
+    }
+
+    // Validate email
+    if (empty(trim($_POST["email"]))) {
+        $email_err = "Please enter your email address.";
+    } elseif (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
+        $email_err = "Invalid email format.";
+    } else {
+        $email = trim($_POST["email"]);
+    }
+
+    // Validate username
+    if (empty(trim($_POST["username"]))) {
+        $username_err = "Please enter a username.";
+    } else {
+        $username = trim($_POST["username"]);
+    }
+
+    // Validate password
+    if (empty(trim($_POST["password"]))) {
+        $password_err = "Please enter a password.";
+    } elseif (strlen(trim($_POST["password"])) < 8) {
+        $password_err = "Password must have at least 8 characters.";
+    } else {
+        $password = trim($_POST["password"]);
+    }
+
+    // Validate confirm password
+    if (empty(trim($_POST["confirm_password"]))) {
+        $confirm_password_err = "Please confirm password.";
+    } else {
+        $confirm_password = trim($_POST["confirm_password"]);
+        if (empty($password_err) && ($password != $confirm_password)) {
+            $confirm_password_err = "Password did not match.";
+        }
+    }
+
+    // Validate CAPTCHA
+    if (empty($_POST["captcha"]) || $_POST["captcha"] != $_SESSION["captcha_code"]) {
+        $captcha_err = "CAPTCHA verification failed.";
+    }
+
+    // Check input errors before inserting into database
+    if (empty($first_name_err) && empty($last_name_err) && empty($email_err) && empty($username_err) && empty($password_err) && empty($confirm_password_err) && empty($captcha_err)) {
+        // Redirect to home page after successful signup
+        header("location: home.php");
+        exit();
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -87,17 +160,28 @@
     <div class="screen">
         <div class="container">
             <h2>Create Your Account</h2>
-            <form method="post" action="signup_process.php">
+            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                 <div class="input-group">
-                    <input type="text" name="first_name" placeholder="First Name" required>
-                    <input type="text" name="last_name" placeholder="Last Name" required>
+                    <input type="text" name="first_name" placeholder="First Name" value="<?php echo $first_name; ?>" required>
+                    <input type="text" name="last_name" placeholder="Last Name" value="<?php echo $last_name; ?>" required>
                 </div>
-                <input type="email" name="email" placeholder="Email Address" required>
-                <input type="text" name="username" placeholder="Username" required>
+                <span class="error"><?php echo $first_name_err; ?></span>
+                <span class="error"><?php echo $last_name_err; ?></span>
+                <input type="email" name="email" placeholder="Email Address" value="<?php echo $email; ?>" required>
+                <span class="error"><?php echo $email_err; ?></span>
+                <input type="text" name="username" placeholder="Username" value="<?php echo $username; ?>" required>
+                <span class="error"><?php echo $username_err; ?></span>
                 <div class="input-group">
                     <input type="password" name="password" placeholder="Password" required>
                     <input type="password" name="confirm_password" placeholder="Confirm Password" required>
                 </div>
+                <span class="error"><?php echo $password_err; ?></span>
+                <span class="error"><?php echo $confirm_password_err; ?></span>
+                <div class="captcha">
+                    <img src="captcha.php" alt="CAPTCHA">
+                    <input type="text" name="captcha" placeholder="Enter CAPTCHA" required>
+                </div>
+                <span class="error"><?php echo $captcha_err; ?></span>
                 <input type="submit" value="Sign Up">
             </form>
             <div class="info">

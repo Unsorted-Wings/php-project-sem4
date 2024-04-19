@@ -1,3 +1,27 @@
+<?php
+session_start();
+
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve username and password from the form
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Validate username and password (You can add your own validation logic here)
+    if ($username === 'admin' && $password === 'password') {
+        // Authentication successful, set session variables
+        $_SESSION['username'] = $username;
+        
+        // Redirect to the home page or dashboard
+        header("Location: home.php");
+        exit;
+    } else {
+        // Authentication failed, show error message
+        $error = "Invalid username or password.";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -71,13 +95,14 @@
     </style>
 </head>
 <body>
-    <div class="screen">
+<div class="screen">
         <div class="container">
             <h2>Login to Your Account</h2>
-            <form method="post" action="login_process.php">
+            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                 <input type="text" name="username" placeholder="Username" required>
                 <input type="password" name="password" placeholder="Password" required>
                 <input type="submit" value="Login">
+                <?php if (isset($error)) { echo '<div class="error">' . $error . '</div>'; } ?>
             </form>
             <div class="info">
                 <a href="forgot_password.php" style="color: #4CAF50; text-decoration: none;">Forgot password?</a>

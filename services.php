@@ -10,6 +10,30 @@
             background-color: #1f1f1f;
             color: #fff;
         }
+        .navbar {
+        background-color: #333;
+        padding: 10px 0;
+        text-align: center;
+        }
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar ul li {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        .navbar ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .navbar ul li a:hover {
+            background-color: #4CAF50;
+        }
         .container {
             max-width: 800px;
             margin: 20px auto;
@@ -42,6 +66,13 @@
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <ul>
+            <li><a href="home.php">Home</a></li>
+            <li><a href="services.php">Services</a></li>
+            <li><a href="contact.php">Contact Us</a></li>
+        </ul>
+    </div>
     <div class="container">
         <h1>Our Services</h1>
         
