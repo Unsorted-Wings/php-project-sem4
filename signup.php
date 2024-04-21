@@ -58,8 +58,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Validate CAPTCHA
-    if (empty($_POST["captcha"]) || $_POST["captcha"] != $_SESSION["captcha_code"]) {
-        $captcha_err = "CAPTCHA verification failed.";
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+        echo $_SESSION['captcha_code'];
+        echo $_POST['captcha'];
+        if ($_POST['captcha'] == $_SESSION['captcha_code']) {
+                echo "Captcha verification passed!"; 
+        } else {  
+            echo "Captcha verification failed!";
+        }
+    }
+    else{
+    $captcha_code = substr(md5(mt_rand()), 0, 6);
+    $_SESSION['captcha_code'] = $captcha_code;
     }
 
     // Check input errors before inserting into database
@@ -178,8 +189,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <span class="error"><?php echo $password_err; ?></span>
                 <span class="error"><?php echo $confirm_password_err; ?></span>
                 <div class="captcha">
-                    <img src="captcha.php" alt="CAPTCHA">
-                    <input type="text" name="captcha" placeholder="Enter CAPTCHA" required>
+                <label for="captcha">Enter Captcha:</label>
+                 <input type="text" id="captcha" name="captcha">
+                <img src="data:image/jpeg;base64,<?php echo base64_encode(generateCaptcha()); ?>" alt="Captcha Image">
                 </div>
                 <span class="error"><?php echo $captcha_err; ?></span>
                 <input type="submit" value="Sign Up">
@@ -194,3 +206,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </body>
 </html>
+
+<?php
+function generateCaptcha() {
+    $image = imagecreate(100, 30);
+    $background_color = imagecolorallocate($image, 255, 255, 255);
+    $text_color = imagecolorallocate($image, 0, 0, 0);
+    $captcha_code = $_SESSION['captcha_code'];
+    imagestring($image, 5, 10, 8, $captcha_code, $text_color);
+    ob_start();
+    imagejpeg($image);
+    $image_data = ob_get_clean();
+    imagedestroy($image);
+    return $image_data;
+}
+?>
