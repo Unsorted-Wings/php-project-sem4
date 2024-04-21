@@ -82,6 +82,8 @@ $username = $_SESSION['username'];
             <li><a href="home.php">Home</a></li>
             <li><a href="services.php">Services</a></li>
             <li><a href="contact.php">Contact Us</a></li>
+            <li><a href="profile.php">Profile</a></li>
+            <li><a href="customers.php">Customers</a></li>
         </ul>
     </div>
 

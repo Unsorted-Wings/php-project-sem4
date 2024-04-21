@@ -1,25 +1,42 @@
 <?php
 session_start();
 
+// Include your database connection file
+include_once "db_connection.php";
+
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve username and password from the form
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Validate username and password (You can add your own validation logic here)
-    if ($username === 'admin' && $password === 'password') {
-        // Authentication successful, set session variables
-        $_SESSION['username'] = $username;
-        
-        // Redirect to the home page or dashboard
-        header("Location: home.php");
-        exit;
+    // Prepare a SQL statement to fetch the hashed password for the user
+    $sql = "SELECT password FROM users WHERE username = '$username'";
+    $result = mysqli_query($conn, $sql);
+
+    if (mysqli_num_rows($result) > 0) {
+        // Fetch the hashed password from the database
+        $row = mysqli_fetch_assoc($result);
+        $hashed_password = $row['password'];
+
+        // Verify the hashed password using password_verify
+        if (password_verify($password, $hashed_password)) {
+            // Password is correct, set session variables and redirect to home page
+            $_SESSION['username'] = $username;
+            header("Location: home.php");
+            exit;
+        } else {
+            // Authentication failed, show error message
+            $error = "Invalid username or password.";
+        }
     } else {
-        // Authentication failed, show error message
+        // User does not exist, show error message
         $error = "Invalid username or password.";
     }
 }
+
+// Close database connection
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
